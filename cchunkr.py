@@ -5,6 +5,9 @@ import subprocess
 from os.path import exists
 
 def parse(sig_str):
+ """
+ Parses sig_str from ctag function into name, line, and signature string
+ """
  il = sig_str.split()
  d = {}
  d['name'] = il[0]
@@ -13,6 +16,9 @@ def parse(sig_str):
  return d
 
 def function_signatures(file_path):
+ """
+ Given valid file_path, extracts functions as strings from either .c or .cpp file
+ """
  cpp = file_path[-2:]=='pp'
  if cpp:
   sigs = subprocess.getoutput('ctags -x --c++-kinds=fp --language-force=c++ '+file_path)
@@ -27,6 +33,9 @@ def function_signatures(file_path):
 
 
 def extract_fun(line_num, file_contents):
+ """
+ Given line_num and file_contents, extracts entire function definition as string
+ """
  i = line_num
  fun_def = ''
  found_end = False
@@ -49,15 +58,10 @@ def extract_fun(line_num, file_contents):
   i += 1
  return fun_def
 
-def main():
- if len(sys.argv) < 2: # usage handling
-  print('Usage: cchunkr.py c_file_to_chunk')
-  return None
- c_file_path = sys.argv[1] # filepath
- if not exists(c_file_path): # check if filepath exists
-  print('File does not exist!')
-  return None
-
+def c_chunkr(c_file_path):
+ """
+ Chunks c file in c_file_path into functions
+ """
  # alright let's do some cool shit
  ds = function_signatures(c_file_path)
  f = open(c_file_path, 'r')
@@ -66,9 +70,5 @@ def main():
  funs = []
  for d in ds:
   fun = extract_fun(int(d['line'])-1, contents)
-  print(fun)
-#  d['definition'] = fun
-#  print(d)
-
-if __name__ == '__main__':
- main()
+  d['definition'] = fun
+ return ds
