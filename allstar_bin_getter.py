@@ -10,7 +10,7 @@ def saveBin(package):
     files = []
     bins = package.get_binaries()
     for b in bins:
-        file = open(b['name'], "wb")
+        file = open('data/'+b['name'], "wb")
         files.append(b['name'])
         file.write(b['content'])
         file.close() 
