@@ -4,6 +4,44 @@ import sys
 import subprocess
 from os.path import exists
 
+def clean_param(p):
+ """
+ Reformats the parameter string into the same format as angr+demangle will get us
+ """
+ s = ''
+ syms = p.strip().split(' ')
+ if syms[0] == 'const':
+  s += 'const'
+  p_type = syms[1]
+  p_name = syms[2]
+ else:
+  p_type = syms[0]
+  p_name = syms[1]
+ if '&' in p:
+  s += '&'
+ if '*' in p:
+  s = '*' + s
+ return p_type+' '+s
+
+def clean_signature(sig_str):
+ """
+ Reformats the function signature into a signature that will match the demangled binary signature
+ """
+
+ # remove type of signature
+ # this naive way works for simple examples
+ if not '::' in sig_str.split(' ')[0]: # if it has a type
+  sig_str = ' '.join(sig_str.split(' ')[1:])
+
+ # remove names of parameters
+ ps = sig_str.split('(')[1].split(')')[0]
+ terms = ps.split(',')
+ if terms[0] == '': return sig_str # early stopping
+ terms = [clean_param(t) for t in terms]
+ sig_str = sig_str.split('(')[0]+'('+', '.join(terms)+')'
+ return sig_str
+
+
 def parse(sig_str):
  """
  Parses sig_str from ctag function into name, line, and signature string
@@ -12,6 +50,7 @@ def parse(sig_str):
  d = {}
  d['name'] = il[0]
  d['line'] = il[2]
+# d['signature'] = clean_signature(il[4]+' '+' '.join(il[5:]))
  d['signature'] = il[4]+' '+' '.join(il[5:])
  return d
 

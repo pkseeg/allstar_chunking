@@ -1,0 +1,11 @@
+# Difficult Matching Example
+
+Here's the source code function signature:
+
+`Settings::setValue(const QString &key, const QVariant &value)`
+
+And here's the matching demangled binary signature:
+
+`Settings::setValue(QString const&, QVariant const&)`
+
+FIXME add another example
