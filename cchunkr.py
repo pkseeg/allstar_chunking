@@ -11,34 +11,42 @@ def clean_param(p):
  s = ''
  syms = p.strip().split(' ')
  if syms[0] == 'const':
+  if len(syms) < 3: return p # early stopping
   s += 'const'
   p_type = syms[1]
   p_name = syms[2]
  else:
+  if len(syms) < 2: return p # early stopping
   p_type = syms[0]
   p_name = syms[1]
  if '&' in p:
   s += '&'
- if '*' in p:
-  s = '*' + s
- return p_type+' '+s
+ if '**' in p:
+  s += '**'
+ elif '*' in p:
+  s += '*'
+ if s != '': s = ' '+s
+ return p_type+s
 
 def clean_signature(sig_str):
  """
  Reformats the function signature into a signature that will match the demangled binary signature
  """
-
  # remove type of signature
  # this naive way works for simple examples
  if not '::' in sig_str.split(' ')[0]: # if it has a type
+  if len(sig_str.split(' ')) == 0: return sig_str # early stopping
   sig_str = ' '.join(sig_str.split(' ')[1:])
 
  # remove names of parameters
+ if '(' not in sig_str or ')' not in sig_str: return sig_str # early stopping
  ps = sig_str.split('(')[1].split(')')[0]
  terms = ps.split(',')
- if terms[0] == '': return sig_str # early stopping
+ if terms[0] == '':
+  return sig_str.split('(')[0]+'('+''+')'
  terms = [clean_param(t) for t in terms]
  sig_str = sig_str.split('(')[0]+'('+', '.join(terms)+')'
+ if sig_str[0] == '*': sig_str = sig_str[1:]
  return sig_str
 
 
@@ -50,8 +58,8 @@ def parse(sig_str):
  d = {}
  d['name'] = il[0]
  d['line'] = il[2]
-# d['signature'] = clean_signature(il[4]+' '+' '.join(il[5:]))
  d['signature'] = il[4]+' '+' '.join(il[5:])
+ d['signature'] = clean_signature(d['signature'])
  return d
 
 def function_signatures(file_path):
