@@ -4,12 +4,19 @@ from bin_chunker import getFuncs
 from cchunkr import c_chunkr
 from demangler import demangle
 import random
+import editdistance
+import os
+import sys
+
+DIST_THRESHOLD = 5 # not sure if this is the best option but we'll try it
 
 from allstar import Repo
 
 def write_packages(package, repo_name='', package_name=''):
  c_files = saveC(package)
  bin_files = saveBin(package)
+ if len(bin_files) == 0: return set() # early stopping
+ if len(c_files) == 0: return set() # early stopping
  bin_funs = []
  bin_fun_names = []
  c_funs = []
@@ -25,8 +32,13 @@ def write_packages(package, repo_name='', package_name=''):
 
  bnames = set(demangle(bin_fun_names))
  cnames = set(c_fun_names)
- intersect = bnames.intersection(cnames) # this is straight matching, fuzzy string matching could be implemented as next step
-
+ intersect = []
+ # intersect = bnames.intersection(cnames) # this is straight matching, fuzzy string matching could be implemented as next step
+ for b in bnames:
+  for c in cnames:
+   dist = editdistance.eval(b, c)
+   if dist < DIST_THRESHOLD:
+    intersect.append((b,c))
  # Logging
  print('Repo : '+repo_name)
  print('Package : '+package_name)
@@ -53,7 +65,14 @@ if __name__ == '__main__':
    funs = write_packages(p, repo_name=r_name, package_name=p_name)
    if len(funs) != 0:
     collected.append((r_name, p_name))
+  except KeyboardInterrupt:
+        print('Interrupted')
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)
   except:
    print('Failed on '+r_name+' '+p_name)
+
  print('Finished!')
  print(collected)

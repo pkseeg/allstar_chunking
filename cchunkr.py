@@ -75,7 +75,12 @@ def function_signatures(file_path):
  sigs = sigs.split('\n')
  ds = []
  for s in sigs:
-  ds.append(parse(s))
+  try:
+   parsed = parse(s)
+   ds.append(parsed)
+  except:
+   # do nothing
+   pass
  return ds
 
 
@@ -116,6 +121,10 @@ def c_chunkr(c_file_path):
  f.close()
  funs = []
  for d in ds:
-  fun = extract_fun(int(d['line'])-1, contents)
-  d['definition'] = fun
- return ds
+  try:
+   fun = extract_fun(int(d['line'])-1, contents)
+   d['definition'] = fun
+   funs.append(d)
+  except:
+   pass
+ return funs
