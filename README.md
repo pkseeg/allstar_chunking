@@ -6,9 +6,9 @@ binary/source code function pairs within the
 
 ## Prereqs
 
-**FIXME** Environment: angr, ctags, allstar repo.
+Environment: angr, ctags, [allstar repo](https://github.com/JHUAPL/ALLSTAR).
 
-python: FIXME
+python: requests, urllib, sys, subprocess, os, random, editdistance
 
 ## How to use
 
@@ -18,4 +18,5 @@ To grab, chunk, and split 20 random function pairs, simply run
 python3 main.py
 ```
 
-This can easily be edited, as well.
+This can easily be edited, as well, to include more than 20 
+random packages or specific packages under specific architectures.
