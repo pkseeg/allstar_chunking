@@ -8,7 +8,8 @@ import editdistance
 import os
 import sys
 
-DIST_THRESHOLD = 5 # not sure if this is the best option but we'll try it
+DIST_THRESHOLD = 5
+NUM_PACKAGES = 20
 
 from allstar import Repo
 
@@ -33,12 +34,13 @@ def write_packages(package, repo_name='', package_name=''):
  bnames = set(demangle(bin_fun_names))
  cnames = set(c_fun_names)
  intersect = []
- # intersect = bnames.intersection(cnames) # this is straight matching, fuzzy string matching could be implemented as next step
  for b in bnames:
   for c in cnames:
    dist = editdistance.eval(b, c)
    if dist < DIST_THRESHOLD:
     intersect.append((b,c))
+ # for straight matching, uncomment
+ # intersect = bnames.intersection(cnames) # this is straight matching, fuzzy string matching could be implemented as next step
  # Logging
  print('Repo : '+repo_name)
  print('Package : '+package_name)
@@ -54,9 +56,9 @@ if __name__ == '__main__':
  with open('allstar_packages.txt', 'r') as f:
   package_names = [l.strip() for l in f.readlines()]
 
- # randomly select 30 packages
+ # randomly select packages
  collected = []
- while len(collected) < 30:
+ while len(collected) < NUM_PACKAGES:
   r_name = random.choice(repo_names)
   p_name = random.choice(package_names)
   try:
